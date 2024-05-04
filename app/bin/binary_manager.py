@@ -32,6 +32,21 @@ class BinManager(object):
         """
         return Path(self.path_, f"{name}{self.ext}")
     
+    def bin_files_list(self) -> list[str]:
+        """
+        Retrieves a list of binary files in the bin directory.
+        Returns:
+            list[str]: List of binary file names.
+        """
+        bin_files: list[str] = []
+
+        for f in os.listdir(self.path_):
+            f_split: list[str] = f.split(".")
+            if len(f_split) >= 2:
+                bin_files.append(f_split[0]) if f_split[1] == self.ext[1::] else None
+                    
+        return bin_files
+    
     def bin_exists(self, name: str) -> bool:
         """
         Checks if the binary file with the given name exists.
