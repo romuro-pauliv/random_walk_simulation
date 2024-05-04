@@ -5,9 +5,12 @@
 # |                                                                                                 romulopauliv@bk.ru |
 # |--------------------------------------------------------------------------------------------------------------------|
 
-# | Imports |----------------------------------------------------------------------------------------------------------|
+# | Internal Imports |-------------------------------------------------------------------------------------------------|
 from generator.coinflip_chunk   import coinflip_simulations
 from log.genlog                 import subprocess_log
+
+# | External Imports |-------------------------------------------------------------------------------------------------|
+from typing                     import Union
 import multiprocessing          as mp
 import numpy                    as np
 # |--------------------------------------------------------------------------------------------------------------------|
@@ -23,26 +26,32 @@ class MultiCore(object):
         """
         self.on_cpu: int = mp.cpu_count() - cpu_offs
     
-    def coinflip_args(self, samples: int, prob: list[float], simulations: int, cumulative: bool) -> None:
+    def coinflip_args(self, samples: int, sample_space: Union[float, int], prob: list[float], simulations: int,
+                      cum: bool) -> None:
         """
         Set up parameters for coin flip simulations.
 
         Args:
             samples (int): Quantity of samples in the simulation.
-            prob (list[float]): Probability of each sample being -1 or 1. In the list [p(-1), p(1)].
+            sample_space: (list[Union[float, int]]): Possible values for each random sample
+            prob (list[float]): if sample_space = [-1, 1] -> probability of each sample 
+                                being -1 or 1. In the list [p(-1), p(1)]
             simulations (int): The number of simulations to be run.
-            cumulative (bool): Whether the simulation results will be accumulated or not.
+            cum (bool): Whether the simulation results will be accumulated or not.
         """
-        self.samples    : int           = samples
-        self.prob       : list[float]   = prob
-        self.simulations: int           = int(simulations/self.on_cpu)
-        self.cumulative : bool          = cumulative
+        self.samples        : int               = samples
+        self.sample_space   : Union[float, int] = sample_space
+        self.prob           : list[float]       = prob
+        self.simulations    : int               = int(simulations/self.on_cpu)
+        self.cumulative     : bool              = cum
     
     def _chunk(self) -> None:
         """
         Run coin flip simulations in chunks.
         """
-        data: np.ndarray = coinflip_simulations(self.samples, self.prob, self.simulations, self.cumulative)
+        data: np.ndarray = coinflip_simulations(
+            self.samples, self.prob, self.simulations, self.cumulative, self.sample_space
+        )
     
     def _generate_subprocess(self) -> None:
         """
