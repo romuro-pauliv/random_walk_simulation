@@ -1,15 +1,6 @@
-# |--------------------------------------------------------------------------------------------------------------------|
-# |                                                                                                    app/__main__.py |
-# |                                                                                                    encoding: UTF-8 |
-# |                                                                                                     Python v: 3.10 |
-# |                                                                                                 romulopauliv@bk.ru |
-# |--------------------------------------------------------------------------------------------------------------------|
-
-# | Imports |----------------------------------------------------------------------------------------------------------|
-from generator.coinflip import GeneratorRandomWalk
-# |--------------------------------------------------------------------------------------------------------------------|
+from core.multicore_simulation import MultiCore
 
 
-generator: GeneratorRandomWalk = GeneratorRandomWalk(100, [0.5, 0.5])
-generator.run()
-print(generator.get_array())
+multicore: MultiCore = MultiCore(1)
+multicore.coinflip_args(200, [0.5, 0.5], 10000, True)
+multicore.run()
