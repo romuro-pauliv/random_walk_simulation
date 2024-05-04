@@ -94,7 +94,7 @@ class BinManager(object):
             Any: The object stored in the binary file.
         """
         path_: PosixPath = self._path_conversor(name)
-        with open(path_, "wb") as f:
+        with open(path_, "rb") as f:
             file: Any = pickle.load(f)
         
         bin_manager_log(path_, "get")
