@@ -8,6 +8,7 @@
 # | Internal Imports |-------------------------------------------------------------------------------------------------|
 from generator.coinflip_chunk   import coinflip_simulations
 from log.genlog                 import subprocess_log
+from bin.binary_manager         import BinManager
 
 # | External Imports |-------------------------------------------------------------------------------------------------|
 from typing                     import Union
@@ -16,7 +17,7 @@ import numpy                    as np
 # |--------------------------------------------------------------------------------------------------------------------|
 
 
-class MultiCore(object):
+class MultiCore(BinManager):
     def __init__(self, cpu_offs: int) -> None:
         """
         Initializes the MultiCore object.
@@ -25,7 +26,9 @@ class MultiCore(object):
             cpu_offs (int): Number of CPU cores to offset from the total available cores.
         """
         self.on_cpu: int = mp.cpu_count() - cpu_offs
-    
+
+        super().__init__()
+        
     def coinflip_args(self, samples: int, sample_space: Union[float, int], prob: list[float], simulations: int,
                       cum: bool) -> None:
         """
@@ -45,13 +48,14 @@ class MultiCore(object):
         self.simulations    : int               = int(simulations/self.on_cpu)
         self.cumulative     : bool              = cum
     
-    def _chunk(self) -> None:
+    def _chunk(self, id: int) -> None:
         """
         Run coin flip simulations in chunks.
         """
         data: np.ndarray = coinflip_simulations(
             self.samples, self.prob, self.simulations, self.cumulative, self.sample_space
         )
+        self.post(f"Core{id}", data)
     
     def _generate_subprocess(self) -> None:
         """
@@ -59,7 +63,7 @@ class MultiCore(object):
         """
         self.process_list: list[mp.Process] = []
         for n in range(self.on_cpu):
-            self.process_list.append(mp.Process(target=self._chunk))
+            self.process_list.append(mp.Process(target=self._chunk, args=(n,)))
     
     def _start_subprocess(self) -> None:
         """
