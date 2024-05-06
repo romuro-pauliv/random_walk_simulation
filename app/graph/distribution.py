@@ -146,10 +146,11 @@ class Distribution(object):
         self.graph2_info()
 
 
+
 class DistAnalysis(object):
     def __init__(self, data: np.ndarray, sample_space: list[str], prob: list[float]) -> None:
         """
-        Initialize Distribution object.
+        Initialize Distribution Analysis object.
 
         Args:
             data (np.ndarray): Data array containing trajectories.
@@ -182,12 +183,15 @@ class DistAnalysis(object):
 
     def mean_std(self) -> None:
         """
-        Calculate data for the second figure.
+        Calculate mean and standard deviation of the data.
         """
         self.std    : np.ndarray = np.std(self.data, axis=0)
         self.mean   : np.ndarray = np.mean(self.data, axis=0)
     
     def xy(self) -> None:
+        """
+        Compute x and y values for plotting.
+        """
         self.y: np.ndarray = self.data[:, -1]
         self.x: np.ndarray = np.arange(min(self.y), max(self.y))
         
@@ -200,15 +204,24 @@ class DistAnalysis(object):
         self.y_gauss: np.ndarray = np.array([self.norm(xt, self.mean[-1], self.std[-1]) for xt in self.x])
     
     def define_fig(self) -> None:
+        """
+        Define the figure for plotting.
+        """
         self.FIG: tuple[Figure, tuple[Axes]] = plt.subplots(1, 3, figsize=(15, 3))
     
     def plot1(self) -> None:
+        """
+        Plot raw data histogram.
+        """
         self.FIG[1][0].hist(self.y, bins=100, color="b", alpha=0.5, label="raw data")
         self.FIG[1][0].grid(True, "both")
         self.FIG[1][0].legend()
         self.FIG[1][0].set_xlabel(f"t = {self.data.shape[1]}")
     
     def plot2(self) -> None:
+        """
+        Plot PDFs.
+        """
         self.FIG[1][1].plot(self.x, self.y_kde, color="b", alpha=0.5, label="pdf numerical")
         self.FIG[1][1].plot(self.x, self.y_gauss, color="r", alpha=0.5, linestyle="dashed", label=r"$pdf(\mu, \sigma)$")
         self.FIG[1][1].grid(True, "both")
@@ -216,6 +229,9 @@ class DistAnalysis(object):
         self.FIG[1][1].set_xlabel(f"t = {self.data.shape[1]}")
         
     def plot3(self) -> None:
+        """
+        Plot cumulative sum of PDFs.
+        """
         self.FIG[1][2].plot(self.x, np.cumsum(self.y_kde), color="b", alpha=0.5, label=r"$\int pdf$ numerical")
         self.FIG[1][2].plot(self.x, np.cumsum(self.y_gauss), color="r", alpha=0.5, linestyle="dashed", label=r"$\int pdf(\mu, \sigma)$")
         self.FIG[1][2].grid(True, "both")
@@ -223,6 +239,9 @@ class DistAnalysis(object):
         self.FIG[1][2].set_xlabel(f"t = {self.data.shape[1]}")
     
     def plot(self) -> None:
+        """
+        Plot all figures.
+        """
         self.plot1()
         self.plot2()
         self.plot3()
