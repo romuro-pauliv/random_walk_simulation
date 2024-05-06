@@ -6,7 +6,7 @@ from data.concatenate_bin_simulations import concat_simulations
 SAMPlES     : int           = 200
 STATES      : list[int]     = [-1, 1]
 PROB        : list[float]   = [0.5, 0.5]
-SIMULATIONS : int           = 10000
+SIMULATIONS : int           = 100000
 ACUMULATE   : bool          = True
 
 CPU_OFF     : int           = 1
@@ -21,8 +21,11 @@ multicore.run()
 import numpy as np
 data: np.ndarray = concat_simulations()
 
-from graph.all_trajectories import Graph_AllTrajectories
 import matplotlib.pyplot as plt
+from graph.all_trajectories import Graph_AllTrajectories
+from graph.distribution import Distribution, DistAnalysis
 
 Graph_AllTrajectories(data, STATES, PROB).plot()
+Distribution(data, STATES, PROB).plot()
+DistAnalysis(data, STATES, PROB).plot()
 plt.show()
